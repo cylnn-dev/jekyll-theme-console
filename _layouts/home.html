@@ -6,12 +6,43 @@ layout: default
 {% assign contentwonl = content | strip_newlines %} {% unless contentwonl == ""  %} <br /> {% endunless %} <!-- add line break if there is any content -->
 
 {%- if site.posts.size > 0 -%}
-  <ul>
-    {%- for post in site.posts -%}
-    <li>
-      {%- assign date_format = "%Y-%m-%d" -%}
-      [ {{ post.date | date: date_format }} ] <a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a>
-    </li>
-    {%- endfor -%}
-  </ul>
+  {%- assign categories = site.posts | map: 'categories' | flatten | uniq -%}
+  {%- for category in categories -%}
+    <h1>{{ category }}</h1>
+    {%- assign category_posts = site.posts | where: 'categories', category -%}
+    {%- assign tags = category_posts | map: 'tags' | flatten | uniq -%}
+    <ul>
+      {%- for post in category_posts -%}
+       {% comment %}
+        <li>
+          {%- assign date_format = "%Y-%m-%d" -%}
+          [ {{ post.date | date: date_format }} ] <a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a>
+        </li>
+      {% endcomment %}
+      {%- endfor -%}
+
+      {%- for tag in tags -%}
+        {%- assign tag_posts = category_posts | where: 'tags', tag -%}
+        {%- if tag_posts.size > 0 -%}
+          <h2>{{ tag }}</h2>
+          <ul>
+            {%- for post in tag_posts -%}
+              <li>
+                {%- assign date_format = "%Y-%m-%d" -%}
+                [ {{ post.date | date: date_format }} ] <a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a>
+              </li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  {%- endfor -%}
 {%- endif -%}
+
+
+
+
+
+
+
+
